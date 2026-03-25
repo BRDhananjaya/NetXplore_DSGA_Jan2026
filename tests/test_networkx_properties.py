@@ -52,9 +52,16 @@ def connected_weighted_graphs(
         if (u, v) not in tree_edge_keys
     ]
     max_extra_edges = min(len(candidate_edges), node_count + 1)
-    extra_edges = draw(
-        st.lists(st.sampled_from(candidate_edges), unique=True, max_size=max_extra_edges)
-    )
+    if candidate_edges:
+        extra_edges = draw(
+            st.lists(
+                st.sampled_from(candidate_edges),
+                unique=True,
+                max_size=max_extra_edges,
+            )
+        )
+    else:
+        extra_edges: list[tuple[int, int]] = []
 
     all_edges = tree_edges + extra_edges
     if distinct_weights:
