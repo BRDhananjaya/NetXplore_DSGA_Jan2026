@@ -18,8 +18,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "networkx>=3.3",
-  "hypothesis>=6.112",
   "pytest>=8.2",
   "ruff>=0.6"
 ]
