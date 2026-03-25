@@ -21,6 +21,11 @@ Algorithms currently covered:
 - Dijkstra shortest path length
 - minimum spanning tree
 - clustering coefficient
+- bridges
+- articulation points
+- centrality measures
+- connected components
+- strongly connected components
 
 ## Quick start
 
@@ -38,6 +43,6 @@ pytest
 
 ## Suggested next steps
 
-1. Add more properties for connectivity, flow, or centrality algorithms.
+1. Add more properties for flow, matching, or centrality algorithms.
 2. Increase graph diversity with additional directed and weighted strategies.
 3. Record any failing Hypothesis examples as evidence if a genuine NetworkX bug is found.
