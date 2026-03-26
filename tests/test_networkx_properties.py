@@ -346,4 +346,3 @@ def test_flow_conservation(graph: nx.Graph) -> None:
         inflow = sum(neighbors.get(node, 0) for neighbors in flow_dict.values())
         outflow = sum(flow_dict[node].values())
         assert inflow == outflow
-    
