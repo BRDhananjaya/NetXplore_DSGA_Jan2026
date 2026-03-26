@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "netxplore-dsga-jan2026"
 version = "0.1.0"
-description = "Property-based tests for NetworkX graph algorithms using Hypothesis"
+description = "Student project for testing NetworkX graph properties with Hypothesis"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
