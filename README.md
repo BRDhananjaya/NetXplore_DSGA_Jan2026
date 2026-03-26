@@ -1,8 +1,7 @@
 # Property-Based Testing for NetworkX Graph Algorithms
 
-## Overview
-
-This repository uses Hypothesis and NetworkX to validate graph-algorithm behavior through mathematical properties rather than fixed example inputs. The test suite focuses on structural invariants, metamorphic properties, and theorem-level guarantees across randomly generated connected graphs.
+This repository contains our E0 2510 project.
+We used Hypothesis with NetworkX to test graph algorithms by checking properties on many generated graphs instead of testing only a few fixed cases.
 
 ## Team Members
 
@@ -10,68 +9,55 @@ This repository uses Hypothesis and NetworkX to validate graph-algorithm behavio
 - Balla Malleswara Rao
 - Bharath Kannan M
 
-## Algorithms Covered
+## What We Tested
 
-- Shortest path properties for unweighted and weighted graphs
-- Dijkstra correctness against brute-force path enumeration
-- Minimum spanning tree structure and optimality properties
-- Connected-component behavior on connected and trivial graphs
-- Max-flow and min-cut consistency with capacity constraints
+- shortest path
+- Dijkstra shortest path
+- minimum spanning tree
+- connected components
+- max flow / min cut
 
-## Properties Verified
+## Properties We Checked
 
-- Triangle inequality for unweighted shortest paths
-- Shortest-path symmetry in undirected weighted graphs
-- Shortest-path stability under positive weight scaling
-- Optimality of shortest-path subpaths
-- Agreement between Dijkstra and brute-force search on small graphs
-- MST edge-count, spanning, idempotence, cut, and cycle properties
-- Single-component reachability for connected graphs
-- Max-flow min-cut equality, flow conservation, and capacity bounds
+- triangle inequality for shortest paths
+- shortest path symmetry in undirected graphs
+- shortest path remains the same when all weights are scaled equally
+- subpaths of a shortest path should also be shortest
+- Dijkstra matches brute-force results on small graphs
+- MST should be a tree, span all nodes, and satisfy cut/cycle properties
+- connected graphs should have one component
+- max flow should match min cut and obey capacity limits
 
-## Graph Generation Strategy
+## Graph Generation
 
-The tests use Hypothesis-native graph builders instead of NetworkX random graph helpers. Each connected graph is constructed from a guaranteed spanning path plus a random set of extra edges, which keeps the strategies deterministic and avoids Hypothesis warnings about hidden randomness.
+For most of the tests, we generate connected graphs first and then add extra edges.
+For weighted graphs, we assign positive integer weights to every edge.
+Those same values are also used as capacities in the flow-related tests.
 
-Weighted graphs assign positive integer edge weights and reuse those values as capacities for the flow tests.
+## Project Files
 
-## Setup
+- [tests/test_networkx_properties.py](tests/test_networkx_properties.py) has the main property-based tests
+- [src/netxplore_dsga_jan2026/__init__.py](src/netxplore_dsga_jan2026/__init__.py) is a minimal package file
+- [pyproject.toml](pyproject.toml) has the project configuration
 
-Create and activate a virtual environment, then install the project in editable mode with development dependencies:
+## Running the Project
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -e .[dev]
-```
-
-If you prefer a minimal install, [requirements.txt](requirements.txt) includes the core packages needed to run the tests.
-
-## Running the Suite
-
-```powershell
 python -m pytest
 ```
 
-Optional linting:
+If needed, you can also run:
 
 ```powershell
-ruff check .
+python -m ruff check .
 ```
 
-## Project Structure
+## Libraries Used
 
-```text
-src/
-	netxplore_dsga_jan2026/
-		__init__.py
-tests/
-	test_networkx_properties.py
-pyproject.toml
-README.md
-requirements.txt
-```
-
-## Notes
-
-The package under [src/netxplore_dsga_jan2026/__init__.py](src/netxplore_dsga_jan2026/__init__.py) is intentionally minimal. The main deliverable is the property-based test suite in [tests/test_networkx_properties.py](tests/test_networkx_properties.py).
+- NetworkX
+- Hypothesis
+- pytest
+- Ruff
