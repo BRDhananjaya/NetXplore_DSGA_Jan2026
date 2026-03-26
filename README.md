@@ -2,76 +2,124 @@
 
 ## Overview
 
-This repository uses Hypothesis and NetworkX to validate graph-algorithm behavior through mathematical properties rather than fixed example inputs. The test suite focuses on structural invariants, metamorphic properties, and theorem-level guarantees across randomly generated connected graphs.
+This project implements property-based testing for graph algorithms using the Hypothesis library and NetworkX.
 
-## Team Members
+Unlike traditional unit testing (which uses fixed inputs), property-based testing generates diverse random graphs and verifies mathematical properties that must always hold. This enables systematic testing across a wide range of graph structures, including edge cases that are difficult to anticipate manually.
 
-- Dhananjaya B R
-- Balla Malleswara Rao
-- Bharath Kannan M
+---
 
 ## Algorithms Covered
 
-- Shortest path properties for unweighted and weighted graphs
-- Dijkstra correctness against brute-force path enumeration
-- Minimum spanning tree structure and optimality properties
-- Connected-component behavior on connected and trivial graphs
-- Max-flow and min-cut consistency with capacity constraints
+We implemented property-based tests for the following algorithms:
 
-## Properties Verified
+- Shortest Path (unweighted and Dijkstra)
+- Minimum Spanning Tree (MST)
+- Connected Components
+- Max Flow / Min Cut
 
-- Triangle inequality for unweighted shortest paths
-- Shortest-path symmetry in undirected weighted graphs
-- Shortest-path stability under positive weight scaling
-- Optimality of shortest-path subpaths
-- Agreement between Dijkstra and brute-force search on small graphs
-- MST edge-count, spanning, idempotence, cut, and cycle properties
-- Single-component reachability for connected graphs
-- Max-flow min-cut equality, flow conservation, and capacity bounds
+---
+
+## Property-Based Testing Approach
+
+Instead of verifying outputs for specific inputs, we validate **fundamental algorithmic properties** derived from graph theory.
+
+### Types of Properties Tested
+
+#### 1. Invariants
+Properties that always hold for valid inputs.
+
+- Triangle inequality for shortest paths  
+- Flow conservation in networks  
+
+---
+
+#### 2. Postconditions
+Properties that must hold for outputs.
+
+- MST has exactly (n − 1) edges  
+- MST is acyclic (tree structure)  
+
+---
+
+#### 3. Metamorphic Properties
+Relationships between outputs under transformations.
+
+- Scaling edge weights does not change shortest path structure  
+- Adding constant weight preserves shortest path  
+- Adding isolated nodes does not affect distances  
+
+---
+
+#### 4. Idempotence
+Repeated application yields same result.
+
+- MST(MST(G)) = MST(G)
+
+---
+
+#### 5. Boundary Conditions
+Edge cases that must be handled correctly.
+
+- Single node graph  
+- Small graphs for brute-force validation  
+
+---
+
+## Advanced Properties Implemented
+
+To strengthen correctness guarantees, we included advanced theoretical properties:
+
+- **Optimal substructure** of shortest paths  
+- **Symmetry of shortest paths** in undirected graphs  
+- **MST cut property**  
+- **MST minimality (weight optimality)**  
+- **Max-flow min-cut theorem**  
+- **Flow capacity constraints**  
+- **Flow conservation law**  
+
+These properties ensure deeper validation beyond basic correctness.
+
+---
 
 ## Graph Generation Strategy
 
-The tests use Hypothesis-native graph builders instead of NetworkX random graph helpers. Each connected graph is constructed from a guaranteed spanning path plus a random set of extra edges, which keeps the strategies deterministic and avoids Hypothesis warnings about hidden randomness.
+We used Hypothesis to generate diverse graph inputs:
 
-Weighted graphs assign positive integer edge weights and reuse those values as capacities for the flow tests.
+- Random graphs using Erdős–Rényi model  
+- Connected graphs (forced connectivity)  
+- Weighted graphs with positive weights  
+- Small graphs for brute-force verification  
 
-## Setup
+This ensures coverage across:
 
-Create and activate a virtual environment, then install the project in editable mode with development dependencies:
+- Different sizes  
+- Different densities  
+- Various topologies  
 
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -e .[dev]
-```
+---
 
-If you prefer a minimal install, [requirements.txt](requirements.txt) includes the core packages needed to run the tests.
+## Key Insight
 
-## Running the Suite
+Property-based testing shifts focus from:
 
-```powershell
-python -m pytest
-```
+"Does this output match expected value?"  
 
-Optional linting:
+to  
 
-```powershell
-ruff check .
-```
+"What must always be true for any valid input?"
+
+This approach provides stronger guarantees of correctness and can reveal subtle bugs.
+
+---
+
+## Tools Used
+
+- Hypothesis (property-based testing)
+- NetworkX (graph algorithms)
+- pytest (test execution)
+
+---
 
 ## Project Structure
-
-```text
-src/
-	netxplore_dsga_jan2026/
-		__init__.py
 tests/
-	test_networkx_properties.py
-pyproject.toml
-README.md
-requirements.txt
-```
-
-## Notes
-
-The package under [src/netxplore_dsga_jan2026/__init__.py](src/netxplore_dsga_jan2026/__init__.py) is intentionally minimal. The main deliverable is the property-based test suite in [tests/test_networkx_properties.py](tests/test_networkx_properties.py).
+└── test_networkx_properties.py
