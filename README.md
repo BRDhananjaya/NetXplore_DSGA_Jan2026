@@ -1,125 +1,63 @@
 # Property-Based Testing for NetworkX Graph Algorithms
 
-## Overview
+This repository contains our E0 2510 project.
+We used Hypothesis with NetworkX to test graph algorithms by checking properties on many generated graphs instead of testing only a few fixed cases.
 
-This project implements property-based testing for graph algorithms using the Hypothesis library and NetworkX.
+## Team Members
 
-Unlike traditional unit testing (which uses fixed inputs), property-based testing generates diverse random graphs and verifies mathematical properties that must always hold. This enables systematic testing across a wide range of graph structures, including edge cases that are difficult to anticipate manually.
+- Dhananjaya B R
+- Balla Malleswara Rao
+- Bharath Kannan M
 
----
+## What We Tested
 
-## Algorithms Covered
+- shortest path
+- Dijkstra shortest path
+- minimum spanning tree
+- connected components
+- max flow / min cut
 
-We implemented property-based tests for the following algorithms:
+## Properties We Checked
 
-- Shortest Path (unweighted and Dijkstra)
-- Minimum Spanning Tree (MST)
-- Connected Components
-- Max Flow / Min Cut
+- triangle inequality for shortest paths
+- shortest path symmetry in undirected graphs
+- shortest path remains the same when all weights are scaled equally
+- subpaths of a shortest path should also be shortest
+- Dijkstra matches brute-force results on small graphs
+- MST should be a tree, span all nodes, and satisfy cut/cycle properties
+- connected graphs should have one component
+- max flow should match min cut and obey capacity limits
 
----
+## Graph Generation
 
-## Property-Based Testing Approach
+For most of the tests, we generate connected graphs first and then add extra edges.
+For weighted graphs, we assign positive integer weights to every edge.
+Those same values are also used as capacities in the flow-related tests.
 
-Instead of verifying outputs for specific inputs, we validate **fundamental algorithmic properties** derived from graph theory.
+## Project Files
 
-### Types of Properties Tested
+- [tests/test_networkx_properties.py](tests/test_networkx_properties.py) has the main property-based tests
+- [src/netxplore_dsga_jan2026/__init__.py](src/netxplore_dsga_jan2026/__init__.py) is a minimal package file
+- [pyproject.toml](pyproject.toml) has the project configuration
 
-#### 1. Invariants
-Properties that always hold for valid inputs.
+## Running the Project
 
-- Triangle inequality for shortest paths  
-- Flow conservation in networks  
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -e .[dev]
+python -m pytest
+```
 
----
+If needed, you can also run:
 
-#### 2. Postconditions
-Properties that must hold for outputs.
+```powershell
+python -m ruff check .
+```
 
-- MST has exactly (n − 1) edges  
-- MST is acyclic (tree structure)  
+## Libraries Used
 
----
-
-#### 3. Metamorphic Properties
-Relationships between outputs under transformations.
-
-- Scaling edge weights does not change shortest path structure  
-- Adding constant weight preserves shortest path  
-- Adding isolated nodes does not affect distances  
-
----
-
-#### 4. Idempotence
-Repeated application yields same result.
-
-- MST(MST(G)) = MST(G)
-
----
-
-#### 5. Boundary Conditions
-Edge cases that must be handled correctly.
-
-- Single node graph  
-- Small graphs for brute-force validation  
-
----
-
-## Advanced Properties Implemented
-
-To strengthen correctness guarantees, we included advanced theoretical properties:
-
-- **Optimal substructure** of shortest paths  
-- **Symmetry of shortest paths** in undirected graphs  
-- **MST cut property**  
-- **MST minimality (weight optimality)**  
-- **Max-flow min-cut theorem**  
-- **Flow capacity constraints**  
-- **Flow conservation law**  
-
-These properties ensure deeper validation beyond basic correctness.
-
----
-
-## Graph Generation Strategy
-
-We used Hypothesis to generate diverse graph inputs:
-
-- Random graphs using Erdős–Rényi model  
-- Connected graphs (forced connectivity)  
-- Weighted graphs with positive weights  
-- Small graphs for brute-force verification  
-
-This ensures coverage across:
-
-- Different sizes  
-- Different densities  
-- Various topologies  
-
----
-
-## Key Insight
-
-Property-based testing shifts focus from:
-
-"Does this output match expected value?"  
-
-to  
-
-"What must always be true for any valid input?"
-
-This approach provides stronger guarantees of correctness and can reveal subtle bugs.
-
----
-
-## Tools Used
-
-- Hypothesis (property-based testing)
-- NetworkX (graph algorithms)
-- pytest (test execution)
-
----
-
-## Project Structure
-tests/
-└── test_networkx_properties.py
+- NetworkX
+- Hypothesis
+- pytest
+- Ruff

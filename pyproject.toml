@@ -5,11 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "netxplore-dsga-jan2026"
 version = "0.1.0"
-description = "Property-based tests for NetworkX graph algorithms using Hypothesis"
+description = "Student project for testing NetworkX graph properties with Hypothesis"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
-  { name = "BRDhananjaya" }
+  { name = "Dhananjaya B R" },
+  { name = "Balla Malleswara Rao" },
+  { name = "Bharath Kannan M" }
 ]
 dependencies = [
   "networkx>=3.3",
@@ -21,6 +23,9 @@ dev = [
   "pytest>=8.2",
   "ruff>=0.6"
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
