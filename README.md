@@ -1,63 +1,50 @@
 # Property-Based Testing for NetworkX Graph Algorithms
 
-This repository contains our E0 2510 project.
-We used Hypothesis with NetworkX to test graph algorithms by checking properties on many generated graphs instead of testing only a few fixed cases.
-
 ## Team Members
 
 - Dhananjaya B R
 - Balla Malleswara Rao
 - Bharath Kannan M
 
-## What We Tested
+## Overview
 
-- shortest path
-- Dijkstra shortest path
-- minimum spanning tree
-- connected components
-- max flow / min cut
+This repository contains a single property-based testing file for selected NetworkX graph algorithms. The tests use Hypothesis to generate many graph instances automatically and then check properties that should always be true from graph theory.
 
-## Properties We Checked
+The project focuses on writing tests that read like mathematical claims about the algorithms instead of fixed example-based checks.
 
-- triangle inequality for shortest paths
-- shortest path symmetry in undirected graphs
-- shortest path remains the same when all weights are scaled equally
-- subpaths of a shortest path should also be shortest
-- Dijkstra matches brute-force results on small graphs
-- MST should be a tree, span all nodes, and satisfy cut/cycle properties
-- connected graphs should have one component
-- max flow should match min cut and obey capacity limits
+## Algorithms Covered
 
-## Graph Generation
+- Shortest path and Dijkstra's algorithm
+- Minimum spanning tree
+- Connected components
+- Maximum flow / minimum cut
 
-For most of the tests, we generate connected graphs first and then add extra edges.
-For weighted graphs, we assign positive integer weights to every edge.
-Those same values are also used as capacities in the flow-related tests.
+## Property Types Used
 
-## Project Files
+- Invariants such as triangle inequality, symmetry, and flow conservation
+- Postconditions such as MST edge count and spanning behavior
+- Metamorphic properties such as weight scaling and adding isolated vertices
+- Idempotence for repeated MST computation
+- Boundary cases such as graphs with only isolated vertices
+- Exhaustive cross-checks on small graphs using brute-force search
 
-- [tests/test_networkx_properties.py](tests/test_networkx_properties.py) has the main property-based tests
-- [src/netxplore_dsga_jan2026/__init__.py](src/netxplore_dsga_jan2026/__init__.py) is a minimal package file
-- [pyproject.toml](pyproject.toml) has the project configuration
+## Graph Generation Strategy
 
-## Running the Project
+The tests generate several kinds of graphs depending on the algorithm:
 
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -e .[dev]
-python -m pytest
-```
+- Connected undirected random graphs
+- Connected weighted graphs with positive integer weights
+- Very small weighted complete graphs for brute-force comparison
+- Directed capacity graphs for flow and cut properties
 
-If needed, you can also run:
+The random generators use explicit seeds so they work cleanly with Hypothesis.
+
+## How To Run
 
 ```powershell
-python -m ruff check .
+.venv\Scripts\python.exe -m pytest
 ```
 
-## Libraries Used
+## Deliverable File
 
-- NetworkX
-- Hypothesis
-- pytest
-- Ruff
+The main submission file is in [tests/test_networkx_properties.py](tests/test_networkx_properties.py).
