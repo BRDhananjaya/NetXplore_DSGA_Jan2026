@@ -1,10 +1,10 @@
 """
-E0 2510 Project: Property-Based Testing for NetworkX
+E0 251o Data Structures and Graph Analytics Project: Property-Based Testing for NetworkX
 
 Team Members:
-- Dhananjaya B R
-- Balla Malleswara Rao
-- Bharath Kannan M
+- Dhananjaya B R - SR-No: 13-19-02-19-52-25-1-2612
+- Balla Malleswara Rao = SR-No: 13-19-02-19-52-25-1-26254
+- Bharath Kannan M - SR-No: 13-19-02-19-52-25-1-26151
 
 Algorithms Tested:
 - Shortest Path (Dijkstra)
@@ -352,6 +352,41 @@ def test_shortest_path_consistent_length(graph):
     assert distance == path_weight(graph, route)
 
 
+@given(connected_graph())
+@common_settings
+def test_adding_edge_does_not_increase_unweighted_distance(graph):
+    """
+    Property: Adding an undirected edge cannot increase shortest-path distance.
+
+    Mathematical reasoning:
+    Adding an edge only adds new candidate routes and never removes existing ones.
+    Therefore, the optimal path length between any two fixed nodes can only stay
+    the same or decrease.
+
+    Graph generation:
+    A connected graph is generated, two existing nodes are selected, and a direct
+    edge is added between them before recomputing the distance.
+
+    Assumptions:
+    Distances are measured on an unweighted undirected graph where each edge has
+    unit cost.
+
+    Why failure matters:
+    A failure would indicate that shortest-path computation is not monotonic with
+    respect to edge additions, which contradicts a core graph property.
+    """
+    nodes = list(graph.nodes())
+    source, target = nodes[0], nodes[-1]
+
+    before = nx.shortest_path_length(graph, source, target)
+
+    updated_graph = graph.copy()
+    updated_graph.add_edge(source, target)
+    after = nx.shortest_path_length(updated_graph, source, target)
+
+    assert after <= before
+
+
 # -----------------------------
 # MST Tests
 # -----------------------------
@@ -563,6 +598,35 @@ def test_mst_spans_all_nodes(graph):
     assert set(tree.nodes()) == set(graph.nodes())
 
 
+@given(weighted_graph())
+@common_settings
+def test_mst_total_weight_not_more_than_original(graph):
+    """
+    Property: The MST total weight is no greater than the original graph weight.
+
+    Mathematical reasoning:
+    The original connected graph itself is a superset of many spanning structures.
+    Since the MST minimizes total spanning-tree cost, its weight cannot exceed the
+    sum of all edges in the original graph.
+
+    Graph generation:
+    A connected weighted graph is generated, then both the full edge-weight sum
+    and the MST edge-weight sum are computed.
+
+    Assumptions:
+    All edge weights are positive integers and the graph is connected.
+
+    Why failure matters:
+    A heavier MST than the full graph would be mathematically inconsistent and
+    would signal a severe problem in MST computation or weight handling.
+    """
+    tree = nx.minimum_spanning_tree(graph, weight="weight")
+    mst_weight = sum(graph[u][v]["weight"] for u, v in tree.edges())
+    original_weight = sum(graph[u][v]["weight"] for u, v in graph.edges())
+
+    assert mst_weight <= original_weight
+
+
 # -----------------------------
 # Connected Components
 # -----------------------------
@@ -639,6 +703,36 @@ def test_isolated_nodes_form_separate_components(count):
     graph.add_nodes_from(range(count))
 
     assert len(list(nx.connected_components(graph))) == count
+
+
+@given(st.integers(min_value=2, max_value=8))
+def test_adding_bridge_reduces_component_count_by_one(count):
+    """
+    Property: Connecting two isolated components reduces component count by one.
+
+    Mathematical reasoning:
+    In an undirected graph, adding one edge between two distinct components merges
+    exactly those components and leaves all others unchanged.
+
+    Graph generation:
+    The test starts from a graph of isolated nodes (one component per node), then
+    adds a single edge between nodes 0 and 1.
+
+    Assumptions:
+    The graph has at least two nodes so the added edge joins distinct components.
+
+    Why failure matters:
+    A failure would mean connected-component updates under edge insertion are not
+    behaving according to the graph connectivity definition.
+    """
+    graph = nx.Graph()
+    graph.add_nodes_from(range(count))
+    before = len(list(nx.connected_components(graph)))
+
+    graph.add_edge(0, 1)
+    after = len(list(nx.connected_components(graph)))
+
+    assert after == before - 1
 
 
 # -----------------------------
@@ -765,3 +859,65 @@ def test_increasing_capacity_does_not_reduce_max_flow(graph):
     after, _ = nx.maximum_flow(updated_graph, source, sink, capacity="capacity")
 
     assert after >= before
+
+
+@given(directed_flow_graph())
+@common_settings
+def test_zero_capacities_give_zero_maxflow(graph):
+    """
+    Property: If all capacities are zero, the maximum flow value is zero.
+
+    Mathematical reasoning:
+    With zero capacity on every edge, no positive flow can traverse any arc. The
+    only feasible flow is the all-zero flow, so the optimum value must be zero.
+
+    Graph generation:
+    A directed flow graph is generated and then copied with every edge capacity
+    overwritten to zero before running max-flow.
+
+    Assumptions:
+    Source and sink are distinct valid nodes in the graph.
+
+    Why failure matters:
+    A non-zero result would violate feasibility constraints and indicate a serious
+    issue in capacity handling.
+    """
+    source, sink = 0, max(graph.nodes())
+    zero_graph = graph.copy()
+
+    for u, v in zero_graph.edges():
+        zero_graph[u][v]["capacity"] = 0
+
+    max_flow_value, _ = nx.maximum_flow(zero_graph, source, sink, capacity="capacity")
+
+    assert max_flow_value == 0
+
+
+@given(directed_flow_graph())
+@common_settings
+def test_flow_value_equals_source_outflow(graph):
+    """
+    Property: Reported max-flow value equals net outflow from the source.
+
+    Mathematical reasoning:
+    By definition of flow value, |f| is the total outgoing flow from the source
+    minus any incoming flow to the source.
+
+    Graph generation:
+    Directed capacity graphs are generated with a guaranteed path from source to
+    sink, then NetworkX returns both the scalar value and the flow dictionary.
+
+    Assumptions:
+    The flow dictionary includes source adjacency entries for relevant edges.
+
+    Why failure matters:
+    If the scalar value disagrees with the represented source flow, the API outputs
+    are internally inconsistent.
+    """
+    source, sink = 0, max(graph.nodes())
+    max_flow_value, flow_dict = nx.maximum_flow(graph, source, sink, capacity="capacity")
+
+    source_outflow = sum(flow_dict[source].values())
+    source_inflow = sum(flow_dict[u].get(source, 0) for u in flow_dict)
+
+    assert max_flow_value == source_outflow - source_inflow
