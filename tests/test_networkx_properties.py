@@ -17,6 +17,9 @@ This file contains property-based tests written with Hypothesis for a small
 set of core NetworkX graph algorithms. The goal is to check mathematical
 properties that should hold across many automatically generated graphs rather
 than only a few fixed examples.
+
+This work is submitted as part of E0 251o Data Structures and Graph Analytics course Project 
+
 """
 
 from itertools import combinations
@@ -873,7 +876,7 @@ def test_zero_capacities_give_zero_maxflow(graph):
 
     Graph generation:
     A directed flow graph is generated and then copied with every edge capacity
-    overwritten to zero before running max-flow.
+    overwritten to zero before running the max-flow algorithm.
 
     Assumptions:
     Source and sink are distinct valid nodes in the graph.
